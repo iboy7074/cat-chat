@@ -1,13 +1,13 @@
 # WhatsApp Clone
 
-A real-time messaging web application built with Node.js, Express, and Socket.io.
+A real-time messaging web application with a choice of backend: **Node.js** or **Python**.
 
 ![WhatsApp Clone](https://img.shields.io/badge/WhatsApp-Clone-25d366?style=for-the-badge&logo=whatsapp&logoColor=white)
 
 ## Features
 
 - **User Authentication** - Register and login with phone number and password
-- **Real-time Messaging** - Instant message delivery using Socket.io
+- **Real-time Messaging** - Instant message delivery using WebSockets
 - **Online Status** - See when users are online (green dot indicator)
 - **Message Indicators** - Sent (✓) and delivered (✓✓) status
 - **Typing Indicator** - Shows when someone is typing
@@ -17,25 +17,36 @@ A real-time messaging web application built with Node.js, Express, and Socket.io
 
 ## Quick Start
 
-### Prerequisites
+### Option 1: Python (Recommended)
 
-- [Node.js](https://nodejs.org/) (v14 or higher)
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-### Installation
+2. Start the server:
+```bash
+python server.py
+```
 
-1. Clone or download this project
+3. Open your browser:
+```
+http://localhost:3000
+```
 
-2. Install dependencies:
+### Option 2: Node.js
+
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Start the server:
+2. Start the server:
 ```bash
 npm start
 ```
 
-4. Open your browser and go to:
+3. Open your browser:
 ```
 http://localhost:3000
 ```
@@ -57,18 +68,27 @@ http://localhost:3000
 ## Project Structure
 
 ```
-├── index.html      # Frontend (HTML/CSS/JS)
-├── server.js       # Backend server
-├── package.json    # Dependencies
-├── data.json       # User data (created automatically)
-└── SPEC.md         # Project specification
+├── index.html         # Frontend (HTML/CSS/JS)
+├── server.py          # Python backend (Flask + SocketIO)
+├── server.js          # Node.js backend (Express + Socket.io)
+├── package.json       # Node.js dependencies
+├── requirements.txt   # Python dependencies
+├── data.json          # User data (created automatically)
+└── README.md          # Documentation
 ```
 
 ## Tech Stack
 
+### Python Version
 | Layer | Technology |
 |-------|------------|
-| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Flask, Flask-SocketIO |
+| Real-time | python-socketio, eventlet |
+| Storage | JSON file |
+
+### Node.js Version
+| Layer | Technology |
+|-------|------------|
 | Backend | Node.js, Express |
 | Real-time | Socket.io |
 | Storage | JSON file |
@@ -77,9 +97,11 @@ http://localhost:3000
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/` | Serve the main app |
 | POST | `/api/register` | Create new user account |
 | POST | `/api/login` | Login with phone & password |
 | GET | `/api/contacts/:phone` | Get user's contacts & messages |
+| GET | `/api/users` | Get all registered users |
 
 ## Socket Events
 
@@ -90,6 +112,35 @@ http://localhost:3000
 | `typing` | Both | Typing indicator |
 | `userOnline` | Server → Client | User came online |
 | `userOffline` | Server → Client | User went offline |
+
+## Troubleshooting
+
+**Port 3000 already in use?**
+```bash
+# Windows - Find and kill process
+netstat -ano | findstr :3000
+taskkill /PID <PID_NUMBER> /F
+
+# Mac/Linux
+lsof -i :3000
+kill -9 <PID>
+```
+
+**Python: Module not found?**
+```bash
+pip install -r requirements.txt
+```
+
+**Node.js: Command not found?**
+- Install Node.js from https://nodejs.org/
+
+**Can't connect to server?**
+- Make sure the server is running
+- Check if port 3000 is not blocked by firewall
+- Try http://127.0.0.1:3000 instead
+
+**Data not persisting?**
+- Delete `data.json` and restart server to reset all data
 
 ## Screenshots
 
@@ -110,26 +161,10 @@ http://localhost:3000
 - Typing indicator
 - Call buttons (decorative)
 
-## Troubleshooting
-
-**Port 3000 already in use?**
-```bash
-# Find and kill the process
-netstat -ano | findstr :3000
-taskkill /PID <PID_NUMBER> /F
-```
-
-**Can't connect to server?**
-- Make sure the server is running (`npm start`)
-- Check if port 3000 is not blocked by firewall
-
-**Data not persisting?**
-- Delete `data.json` and restart server to reset all data
-
 ## License
 
 Free to use for educational purposes.
 
 ---
 
-Made with ❤️ using Node.js + Socket.io
+Made with ❤️ - Supports both Python & Node.js
