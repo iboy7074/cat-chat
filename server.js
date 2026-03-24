@@ -30,7 +30,8 @@ function loadData() {
     }
     return {
         users: {},
-        messages: {}
+        messages: {},
+        contacts: {}
     };
 }
 
@@ -63,6 +64,7 @@ const autoReplies = [
 ];
 
 let data = loadData();
+if (!data.contacts) data.contacts = {};
 let onlineUsers = new Map();
 
 app.post('/api/register', (req, res) => {
@@ -83,6 +85,7 @@ app.post('/api/register', (req, res) => {
     };
     
     data.messages[phone] = {};
+    data.contacts[phone] = [];
     defaultContacts.forEach(contact => {
         data.messages[phone][contact.phone] = [];
     });
@@ -106,7 +109,9 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/contacts/:phone', (req, res) => {
     const { phone } = req.params;
-    const userContacts = defaultContacts.map(contact => {
+    const customContacts = data.contacts[phone] || [];
+    const allContacts = [...defaultContacts, ...customContacts];
+    const userContacts = allContacts.map(contact => {
         const messages = data.messages[phone]?.[contact.phone] || [];
         const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
         return {
@@ -122,6 +127,42 @@ app.get('/api/contacts/:phone', (req, res) => {
     });
     
     res.json(userContacts);
+});
+
+app.post('/api/contacts', (req, res) => {
+    const { userPhone, name, contactPhone } = req.body;
+    
+    if (!userPhone || !name || !contactPhone) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    if (!data.contacts[userPhone]) {
+        data.contacts[userPhone] = [];
+    }
+    
+    const exists = data.contacts[userPhone].find(c => c.phone === contactPhone) || defaultContacts.find(c => c.phone === contactPhone);
+    if (exists) {
+        return res.status(400).json({ error: 'Contact already exists' });
+    }
+    
+    const newContact = {
+        id: Date.now(),
+        name,
+        phone: contactPhone,
+        online: false
+    };
+    
+    data.contacts[userPhone].push(newContact);
+    
+    if (!data.messages[userPhone]) {
+        data.messages[userPhone] = {};
+    }
+    if (!data.messages[userPhone][contactPhone]) {
+        data.messages[userPhone][contactPhone] = [];
+    }
+    
+    saveData(data);
+    res.json({ success: true, contact: newContact });
 });
 
 app.get('/api/users', (req, res) => {
